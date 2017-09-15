@@ -1,0 +1,30 @@
+{
+  "name": "gylt",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "apollo-client": "^1.9.2",
+    "graphql-tag": "^2.4.2",
+    "react": "16.0.0-alpha.12",
+    "react-apollo": "^1.4.15",
+    "react-native": "0.48.3",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-devtools-extension": "^2.13.2"
+  },
+  "devDependencies": {
+    "babel-jest": "21.0.2",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "21.1.0",
+    "react-test-renderer": "16.0.0-alpha.12",
+    "reactotron-react-native": "^1.12.3",
+    "reactotron-redux": "^1.12.2"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
