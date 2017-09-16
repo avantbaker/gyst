@@ -1,49 +1,45 @@
 import React, { Component } from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
 import { ApolloProvider } from 'react-apollo';
-import { store, client } from '../ReactotronConfig';
+import Reactotron from 'reactotron-react-native';
+import { reactotronRedux } from 'reactotron-redux';
+import { combineReducers, applyMiddleware } from 'redux';
+import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import AppWithNavigationState, { navigationReducer } from "./navigation";
+
+// Create the Network Interface for graphql endpoint
+const networkInterface = createNetworkInterface({
+    uri: 'http://localhost:8080/graphql'
+});
+
+// create an instance of the ApolloClient
+export const client = new ApolloClient({
+    networkInterface
+});
+
+Reactotron
+    .configure({
+        name: 'Gylt'
+    }) // controls connection & communication settings
+    .useReactNative()
+    .use(reactotronRedux()) // add all built-in react native plugins // let's connect!
+    .connect();
+
+const store = Reactotron.createStore(
+    combineReducers({
+        apollo: client.reducer(),
+        nav: navigationReducer
+    }),
+    {},
+    applyMiddleware(client.middleware())
+);
 
 console.disableYellowBox = true;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
-    },
-});
 
 export default class gylt extends Component {
     render() {
         return (
             <ApolloProvider store={store} client={client}>
-                <View style={styles.container}>
-                    <Text style={styles.welcome}>
-                        Welcome to React Native!
-                    </Text>
-                    <Text style={styles.instructions}>
-                        To get started, edit index.ios.js
-                    </Text>
-                    <Text style={styles.instructions}>
-                        Press Cmd+R to reload,{'\n'}
-                        Cmd+D or shake for dev menu
-                    </Text>
-                </View>
+                <AppWithNavigationState />
             </ApolloProvider>
         );
     }

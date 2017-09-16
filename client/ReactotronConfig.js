@@ -13,13 +13,12 @@ export const client = new ApolloClient({
     networkInterface
 });
 
-Reactotron
+export const reactotronConnection = Reactotron
     .configure({
         name: 'Gylt'
     }) // controls connection & communication settings
     .useReactNative()
-    .use(reactotronRedux())// add all built-in react native plugins
-    .connect(); // let's connect!
+    .use(reactotronRedux())// add all built-in react native plugins // let's connect!
 
 export const store = Reactotron.createStore(
     combineReducers({
