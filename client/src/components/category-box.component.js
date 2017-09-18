@@ -58,16 +58,26 @@ const {
 } = styles;
 
 class Box extends Component {
+    renderItemsLeft() {
+        const { itemsLeft } = this.props;
+        return itemsLeft ? <View style={ itemsLeftIndicator }>
+                                <Text style={ itemsLeftText }>{ itemsLeft }</Text>
+                            </View> : undefined
+    }
+
+    renderContent() {
+        const { component, icon } = this.props;
+        return component ? component : <Icon name={ icon } style={ itemIcon }/>
+    }
+
     render() {
-        const { icon, title, itemsLeft } = this.props;
+        const { icon, title } = this.props;
         return (
-            <View style={ boxWrapper }>
-                <View style={ itemsLeftIndicator }>
-                    <Text style={ itemsLeftText }>{ itemsLeft }</Text>
-                </View>
-                <View style={ box }>
-                    <Icon name={ icon } style={ itemIcon }/>
-                    <Text style={ itemTitle }>{ title }</Text>
+            <View style={ [ boxWrapper, this.props.boxWrapperStyle] }>
+                { this.renderItemsLeft() }
+                <View style={ [box, this.props.boxInnerStyle ] }>
+                    { this.renderContent() }
+                    <Text style={ [itemTitle, this.props.itemTitleStyle] }>{ title }</Text>
                 </View>
             </View>
         );

@@ -1,14 +1,11 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import {
-    Text,
     View,
     StyleSheet,
-    FlatList
+    FlatList,
 } from 'react-native';
-import moment from 'moment';
-import Box from '../components/category-box.component';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import CategoryLabel from "../components/category-label.component";
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -16,12 +13,6 @@ const styles = StyleSheet.create({
         padding: 20,
         paddingBottom: 30,
         flex: 1
-    },
-    container: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        backgroundColor: 'white',
-        flexWrap: 'wrap',
     },
     header: {
         backgroundColor: 'white',
@@ -35,25 +26,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginRight: 20
     },
-    dateContainer: {
-        height: 20,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    dateText: {
-        top: -20,
-        fontWeight: 'bold',
-        fontSize: 16 }
-    });
+});
 
 const {
     screenWrapper,
-    container,
     header,
     headerLeft,
     headerRight,
-    dateContainer,
-    dateText
 } = styles;
 
 const data = [
@@ -61,7 +40,6 @@ const data = [
         id: 1,
         icon: "users",
         title: "Family",
-        itemsLeft: 2
     },
     {
         id: 2,
@@ -73,78 +51,66 @@ const data = [
         id: 3,
         icon: "leaf",
         title: "Health",
-        itemsLeft: 0
     },
     {
         id: 4,
         icon: "home",
         title: "Home",
-        itemsLeft: 3
     },
     {
         id: 5,
         icon: "shopping-bag",
         title: "Fashion",
-        itemsLeft: 0
     },
     {
         id: 6,
         icon: "reddit",
         title: "Personal",
-        itemsLeft: 0
     },
     {
         id: 7,
         icon: "heart",
         title: "Love",
-        itemsLeft: 1
     },
     {
         id: 8,
         icon: "code-fork",
         title: "Work",
-        itemsLeft: 3
     },
     {
         id: 9,
         icon: "btc",
         title: "Finance",
-        itemsLeft: 1
     }
 ];
 
 /*
-    TODO: Create the Detail Screen
-    TODO: Create the Analytics Screen
-    TODO: Add click action to Left Header and Right Header. Action should launch a Drawer menu
-    TODO: Add click navigation for Boxes to go to their Detail Page
-    TODO: Shrink the Header Size
+    TODO: Add input to allow creation of a new Todo Item
+    TODO: Connect headerRight button to launch add new input dropdown
+    TODO: add subtext to display swipe to delete text
+    TODO: Add faded background image of Category Icon
  */
 
-class Home extends Component {
+class CategoryDetail extends Component {
 
     static navigationOptions = {
-        title: 'Home',
+        title: 'Categories',
         headerStyle: header,
         headerLeft: <Icon name="google" style={ headerLeft }/>,
-        headerRight: <Icon name="line-chart" style={ headerRight } />
+        headerRight: <Icon name="plus" style={ headerRight } />
     };
 
     keyExtractor = item => item.id;
 
-    renderBox = ({ item: { icon, title, itemsLeft } }) => {
-        return <Box title={title} itemsLeft={ itemsLeft } icon={icon} />
+    renderBox = ({ item: { title, icon } }) => {
+        return <CategoryLabel title={title} icon={icon} />
     };
 
     render() {
         return (
             <View style={ screenWrapper }>
-                <View style={ dateContainer }>
-                    <Text style={ dateText }> { moment().format("MMM Do YYYY") } </Text>
-                </View>
                 <FlatList
                     data={data}
-                    contentContainerStyle={ container }
                     keyExtractor={ this.keyExtractor }
                     renderItem={ this.renderBox }
                     showsVerticalScrollIndicator={false}
@@ -154,4 +120,4 @@ class Home extends Component {
     }
 }
 
-export default Home;
+export default CategoryDetail;

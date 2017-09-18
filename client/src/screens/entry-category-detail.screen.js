@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import {
     Text,
@@ -7,8 +6,9 @@ import {
     FlatList
 } from 'react-native';
 import moment from 'moment';
-import Box from '../components/category-box.component';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import Todo from '../components/todo-item.component';
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -17,15 +17,12 @@ const styles = StyleSheet.create({
         paddingBottom: 30,
         flex: 1
     },
-    container: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        backgroundColor: 'white',
-        flexWrap: 'wrap',
-    },
     header: {
         backgroundColor: 'white',
         shadowColor: 'transparent',
+    },
+    headerTitle: {
+        fontSize: 10
     },
     headerLeft: {
         fontSize: 20,
@@ -43,12 +40,12 @@ const styles = StyleSheet.create({
     dateText: {
         top: -20,
         fontWeight: 'bold',
-        fontSize: 16 }
-    });
+        fontSize: 16
+    },
+});
 
 const {
     screenWrapper,
-    container,
     header,
     headerLeft,
     headerRight,
@@ -59,81 +56,46 @@ const {
 const data = [
     {
         id: 1,
-        icon: "users",
-        title: "Family",
-        itemsLeft: 2
+        title: "Call Mom",
+        description: "Make sure that you ask her about that thing that you have to do. She hasn't been doing that well",
+        complete: false
     },
     {
         id: 2,
-        icon: "odnoklassniki",
-        title: "Fitness",
-        itemsLeft: 1
+        title: "Pick up a gift for Ashley's Baby Shower",
+        description: "Im thinking about getting her some daipers or maybe a crib or something",
+        complete: true
     },
     {
         id: 3,
-        icon: "leaf",
-        title: "Health",
-        itemsLeft: 0
-    },
-    {
-        id: 4,
-        icon: "home",
-        title: "Home",
-        itemsLeft: 3
-    },
-    {
-        id: 5,
-        icon: "shopping-bag",
-        title: "Fashion",
-        itemsLeft: 0
-    },
-    {
-        id: 6,
-        icon: "reddit",
-        title: "Personal",
-        itemsLeft: 0
-    },
-    {
-        id: 7,
-        icon: "heart",
-        title: "Love",
-        itemsLeft: 1
-    },
-    {
-        id: 8,
-        icon: "code-fork",
-        title: "Work",
-        itemsLeft: 3
-    },
-    {
-        id: 9,
-        icon: "btc",
-        title: "Finance",
-        itemsLeft: 1
+        title: "Schedule a workout with dad",
+        description: "We should work on legs and back this time",
+        complete: false
     }
 ];
 
 /*
-    TODO: Create the Detail Screen
-    TODO: Create the Analytics Screen
-    TODO: Add click action to Left Header and Right Header. Action should launch a Drawer menu
-    TODO: Add click navigation for Boxes to go to their Detail Page
-    TODO: Shrink the Header Size
+    TODO: Add input to allow creation of a new Todo Item
+    TODO: Connect headerRight button to launch add new input dropdown
+    TODO: add subtext to display swipe to delete text
+    TODO: Add faded background image of Category Icon
+    TODO: Integrate Category Name in header
+    TODO: Create Dropdown component to contain input
  */
 
-class Home extends Component {
+class CategoryDetail extends Component {
 
     static navigationOptions = {
-        title: 'Home',
+        title: 'Category Name Here',
         headerStyle: header,
         headerLeft: <Icon name="google" style={ headerLeft }/>,
-        headerRight: <Icon name="line-chart" style={ headerRight } />
+        headerRight: <Icon name="plus" style={ headerRight } />
     };
 
     keyExtractor = item => item.id;
 
-    renderBox = ({ item: { icon, title, itemsLeft } }) => {
-        return <Box title={title} itemsLeft={ itemsLeft } icon={icon} />
+    renderBox = ({ item: { title, description, complete } }) => {
+        return <Todo title={title} description={description} />
     };
 
     render() {
@@ -144,7 +106,6 @@ class Home extends Component {
                 </View>
                 <FlatList
                     data={data}
-                    contentContainerStyle={ container }
                     keyExtractor={ this.keyExtractor }
                     renderItem={ this.renderBox }
                     showsVerticalScrollIndicator={false}
@@ -154,4 +115,4 @@ class Home extends Component {
     }
 }
 
-export default Home;
+export default CategoryDetail;
