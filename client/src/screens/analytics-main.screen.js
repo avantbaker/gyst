@@ -3,12 +3,14 @@ import {
     View,
     StyleSheet,
     Text,
-    ProgressViewIOS
+    ProgressViewIOS,
+    TouchableOpacity
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar } from 'react-native-calendars';
 import Box from '../components/category-box.component';
 import FullWidthButton from "../components/full-width-button.component";
+import moment from 'moment';
 
 // import ProgressBar from '../components/progress-bar.component';
 
@@ -35,55 +37,77 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 20
     },
-    headerRight: {
-        fontSize: 20,
-        marginRight: 20
+    progressBarWrapper: {
+        justifyContent: 'center',
+        alignItems: 'center'
     },
-    dateContainer: {
-        height: 20,
-        alignItems: 'center',
-        justifyContent: 'center'
+    progressBar: {
+        width: 300
     },
-    dateText: {
-        top: -20,
-        fontWeight: 'bold',
-        fontSize: 16
+    calendarAndContentWrapper: {
+        flex: 1,
+        marginTop: 10
     },
+    calendar: {
+        marginBottom: 8
+    }
 });
+
+const calendarTheme =  {
+    selectedDayBackgroundColor: 'black',
+    selectedDayTextColor: 'white',
+    arrowColor: 'black'
+};
 
 const {
     screenWrapper,
     header,
     headerLeft,
     container,
+    progressBarWrapper,
+    progressBar,
+    calendarAndContentWrapper,
+    calendar
 } = styles;
 
 /*
+    TODO: Create Component for the inner Content on this pages boxes
  */
 
 class Analytics extends Component {
 
-    static navigationOptions = {
+    static navigationOptions = ({ navigation }) => ({
         title: 'Analytics',
         headerStyle: header,
-        headerLeft: <Icon name="google" style={ headerLeft }/>,
-    };
+        headerLeft: <TouchableOpacity onPress={ () => navigation.navigate('DrawerOpen') }>
+                        <Icon name="google" style={ headerLeft }/>
+                    </TouchableOpacity>,
+    });
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            selected: [moment().format()]
+        }
+    }
 
     render() {
         return (
             <View style={ screenWrapper }>
-                <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+                <View style={ progressBarWrapper }>
                     <ProgressViewIOS
                         progressTintColor={"black"}
-                        style={{ width: 300 }}
-                        progress={.6}
+                        style={ progressBar }
+                        progress={ .6 }
                     />
                 </View>
-                <View style={{ flex: 1, marginTop: 10 }}>
-                    <Calendar theme={{
-                        selectedDayBackgroundColor: 'black',
-                        selectedDayTextColor: 'white', arrowColor: 'black'}} />
+                <View style={ calendarAndContentWrapper }>
+                    <Calendar
+                        style={ calendar }
+                        selected={ this.state.selected }
+                        onDayPress={ (day) => this.setState({ selected: [ day.dateString ]}) }
+                        theme={ calendarTheme } />
                     <View style={ container }>
                         <Box title="Today" component={ <Text>6/10</Text> } />
                         <Box title="Overall" component={ <Text>80%</Text> } />

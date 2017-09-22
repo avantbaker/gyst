@@ -4,7 +4,8 @@ import {
     Text,
     View,
     StyleSheet,
-    Dimensions
+    Dimensions,
+    TouchableOpacity
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -58,28 +59,37 @@ const {
 } = styles;
 
 class Box extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.goToCategoryDetail = this.props.onPress ? this.props.onPress.bind(this, this.props.category ) : undefined;
+    }
+
     renderItemsLeft() {
-        const { itemsLeft } = this.props;
+        const { itemsLeft } = this.props.category || this.props;
         return itemsLeft ? <View style={ itemsLeftIndicator }>
                                 <Text style={ itemsLeftText }>{ itemsLeft }</Text>
                             </View> : undefined
     }
 
     renderContent() {
-        const { component, icon } = this.props;
+        const { component, icon } = this.props.category || this.props;
         return component ? component : <Icon name={ icon } style={ itemIcon }/>
     }
 
     render() {
-        const { icon, title } = this.props;
+        const { icon, title } = this.props.category || this.props;
         return (
-            <View style={ [ boxWrapper, this.props.boxWrapperStyle] }>
-                { this.renderItemsLeft() }
-                <View style={ [box, this.props.boxInnerStyle ] }>
-                    { this.renderContent() }
-                    <Text style={ [itemTitle, this.props.itemTitleStyle] }>{ title }</Text>
+            <TouchableOpacity onPress={ this.goToCategoryDetail } >
+                <View style={ [ boxWrapper, this.props.boxWrapperStyle] }>
+                    { this.renderItemsLeft() }
+                    <View style={ [box, this.props.boxInnerStyle ] }>
+                        { this.renderContent() }
+                        <Text style={ [itemTitle, this.props.itemTitleStyle] }>{ title }</Text>
+                    </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }
 }

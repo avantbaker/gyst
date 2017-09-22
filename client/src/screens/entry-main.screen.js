@@ -4,7 +4,8 @@ import {
     Text,
     View,
     StyleSheet,
-    FlatList
+    FlatList,
+    TouchableOpacity
 } from 'react-native';
 import moment from 'moment';
 import Box from '../components/category-box.component';
@@ -123,17 +124,43 @@ const data = [
 
 class Home extends Component {
 
-    static navigationOptions = {
+    static navigationOptions = ({ navigation }) => ({
         title: 'Home',
         headerStyle: header,
-        headerLeft: <Icon name="google" style={ headerLeft }/>,
+        headerLeft: <TouchableOpacity onPress={ () => navigation.navigate('DrawerOpen') }>
+                        <Icon name="google" style={ headerLeft }/>
+                    </TouchableOpacity>,
         headerRight: <Icon name="line-chart" style={ headerRight } />
-    };
+    });
+
+    constructor(props) {
+        super(props);
+
+        this.goToCategoryDetail = this.goToCategoryDetail.bind(this);
+        this.goToMenu = this.goToMenu.bind(this);
+    }
 
     keyExtractor = item => item.id;
 
-    renderBox = ({ item: { icon, title, itemsLeft } }) => {
-        return <Box title={title} itemsLeft={ itemsLeft } icon={icon} />
+    goToCategoryDetail(category) {
+        const { navigate } = this.props.navigation;
+
+        navigate('DetailsScreen', {
+            id: category.id,
+            title: category.title,
+            from: 'HomeScreen'
+        })
+    }
+
+    goToMenu() {
+        const { navigate } = this.props.navigation;
+
+        navigate('Menu');
+    }
+
+    renderBox = ({ item }) => {
+        // TODO: Refactor the Box component to only take an item
+        return <Box category={ item } onPress={ this.goToCategoryDetail } />
     };
 
     render() {

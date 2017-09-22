@@ -3,7 +3,8 @@ import {
     Text,
     View,
     StyleSheet,
-    FlatList
+    FlatList,
+    TouchableOpacity
 } from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -85,16 +86,18 @@ const data = [
 
 class CategoryDetail extends Component {
 
-    static navigationOptions = {
-        title: 'Category Name Here',
+    static navigationOptions = ({ navigation }) => ({
+        title: navigation.state.params ? navigation.state.params.title : "Category",
         headerStyle: header,
-        headerLeft: <Icon name="google" style={ headerLeft }/>,
-        headerRight: <Icon name="plus" style={ headerRight } />
-    };
+        headerLeft: <TouchableOpacity onPress={ () => navigation.goBack() }>
+                        <Icon name="chevron-left" style={ headerLeft }/>
+                    </TouchableOpacity>,
+        headerRight: <Icon name="plus" style={ headerRight } />,
+    });
 
     keyExtractor = item => item.id;
 
-    renderBox = ({ item: { title, description, complete } }) => {
+    renderBox = ({ item: { title, description } }) => {
         return <Todo title={title} description={description} />
     };
 

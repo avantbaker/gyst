@@ -3,15 +3,24 @@ import {
     View,
     StyleSheet,
     FlatList,
+    TouchableOpacity,
+    Animated,
+    Easing,
+    Text
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryLabel from "../components/category-label.component";
+// import SortableList from 'react-native-sortable-list';
+import DropdownAlert from '../components/dropdown.component';
 
 const styles = StyleSheet.create({
     screenWrapper: {
         backgroundColor: 'white',
         padding: 20,
         paddingBottom: 30,
+        flex: 1
+    },
+    container: {
         flex: 1
     },
     header: {
@@ -30,6 +39,7 @@ const styles = StyleSheet.create({
 
 const {
     screenWrapper,
+    container,
     header,
     headerLeft,
     headerRight,
@@ -91,19 +101,74 @@ const data = [
     TODO: Add faded background image of Category Icon
  */
 
-class CategoryDetail extends Component {
+// const Sortable = (WrappedComponent) => {
+//     return class extends Component {
+//         constructor(props) {
+//             super(props);
+//
+//             this._active = new Animated.Value(0);
+//
+//             this._style = {
+//                 transform: [{
+//                     scale: this._active.interpolate({
+//                         inputRange: [0,1],
+//                         outputRange: [0,1.1]
+//                     })
+//                 }],
+//                 shadowRadius: this._active.interpolate({
+//                     inputRange: [0,1],
+//                     outputRange: [2,10]
+//                 })
+//             };
+//         }
+//
+//         componentWillReceiveProps(nextProps) {
+//             if( this.props.active !== nextProps.active ) {
+//                 Animated.timing(this._active, {
+//                     duration: 300,
+//                     easing: Easing.bounce,
+//                     toValue: Number(nextProps.active)
+//                 }).start();
+//             }
+//         }
+//
+//         render() {
+//             const { data } = this.props;
+//             console.log(data);
+//             return (
+//                 <Animated.View style={this._style}>
+//                     <WrappedComponent title={ data.title } icon={ data.icon }/>
+//                 </Animated.View>
+//             )
+//         }
+//     }
+// };
+//
+// const SortableCategory = Sortable(CategoryLabel);
 
-    static navigationOptions = {
+class CategoryList extends Component {
+
+    static navigationOptions = ({ navigation }) => ({
         title: 'Categories',
         headerStyle: header,
-        headerLeft: <Icon name="google" style={ headerLeft }/>,
+        headerLeft: <TouchableOpacity onPress={ () => navigation.navigate('DrawerOpen') }>
+                        <Icon name="google" style={ headerLeft }/>
+                    </TouchableOpacity>,
         headerRight: <Icon name="plus" style={ headerRight } />
-    };
+    });
 
     keyExtractor = item => item.id;
 
     renderBox = ({ item: { title, icon } }) => {
         return <CategoryLabel title={title} icon={icon} />
+    };
+
+    showAlert(item) {
+        this.dropdown.alertWithType();
+    }
+
+    dismissAlert = () => {
+        this.dropdown.dismiss()
     };
 
     render() {
@@ -115,9 +180,22 @@ class CategoryDetail extends Component {
                     renderItem={ this.renderBox }
                     showsVerticalScrollIndicator={false}
                 />
+                <DropdownAlert
+                    ref={(ref) => this.dropdown = ref }
+                    containerStyle={{
+                        backgroundColor: 'red',
+                    }}
+                />
+                {/*<TouchableOpacity onPress={() => this.showAlert() }>*/}
+                    {/*<Text>Open</Text>*/}
+                {/*</TouchableOpacity>*/}
+                {/*<TouchableOpacity onPress={() => this.dismissAlert() }>*/}
+                    {/*<Text>Close</Text>*/}
+                {/*</TouchableOpacity>*/}
             </View>
         )
     }
 }
 
-export default CategoryDetail;
+export default CategoryList;
+
