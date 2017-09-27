@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import {
     StyleSheet,
     View,
-    TouchableHighlight,
     Animated,
     Platform,
 } from "react-native";
@@ -10,7 +9,6 @@ import {
 let styles = StyleSheet.create({
     defaultContainer: {
         padding: 8,
-        paddingTop: (Platform.OS === 'android') ? 0 : 20,
         flexDirection: 'row'
     },
     textContainer: {
@@ -31,7 +29,7 @@ export default class Dropdown extends Component {
         replaceEnabled: true,
         containerStyle: {
             padding: 16,
-            flexDirection: 'row'
+            flexDirection: 'column'
         },
         elevation: 1,
     };
@@ -95,7 +93,6 @@ export default class Dropdown extends Component {
                 toValue: toValue,
                 duration: this.state.duration,
                 friction: 9,
-                useNativeDriver: (Platform.OS === 'ios')
             }
         ).start()
     }
@@ -118,11 +115,9 @@ export default class Dropdown extends Component {
                         right: 0,
                         elevation: this.props.elevation
                     }}>
-                    <TouchableHighlight onPress={ () => this.dismiss() }>
-                        <View style={style}>
-                            { this.props.children }
-                        </View>
-                    </TouchableHighlight>
+                    <View style={style}>
+                        { this.props.children }
+                    </View>
                 </Animated.View>
             )
         }

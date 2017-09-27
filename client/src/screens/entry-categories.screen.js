@@ -6,12 +6,19 @@ import {
     TouchableOpacity,
     Animated,
     Easing,
-    Text
+    Text,
+    TextInput,
+    Dimensions,
+    TouchableHighlight
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryLabel from "../components/category-label.component";
-// import SortableList from 'react-native-sortable-list';
-import DropdownAlert from '../components/dropdown.component';
+import _ from 'underscore';
+
+const window = Dimensions.get('window');
+
+import SortableListView from 'react-native-sortable-listview';
+import Dropdown from '../components/dropdown.component';
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -35,6 +42,34 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginRight: 20
     },
+    dropdownContainer: {
+        backgroundColor: 'black',
+        paddingBottom: 10,
+        paddingLeft: 20,
+        paddingRight: 20
+    },
+    dropdownInput: {
+        height: 40,
+        borderColor: 'white',
+        borderBottomWidth: 2,
+        flex: 1,
+        color: 'white'
+    },
+    contentContainer: {
+        width: window.width,
+        paddingHorizontal: 30,
+    },
+    row: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: 16,
+        height: 80,
+        flex: 1,
+        marginTop: 7,
+        marginBottom: 12,
+        borderRadius: 4,
+    }
 });
 
 const {
@@ -43,6 +78,9 @@ const {
     header,
     headerLeft,
     headerRight,
+    dropdownContainer,
+    dropdownInput,
+    row
 } = styles;
 
 const data = [
@@ -93,105 +131,108 @@ const data = [
         title: "Finance",
     }
 ];
+const keys = Array.apply(null, {length: data.length}).map(Number.call, Number);
+const dataObj = _.object(keys, data);
 
 /*
-    TODO: Add input to allow creation of a new Todo Item
-    TODO: Connect headerRight button to launch add new input dropdown
     TODO: add subtext to display swipe to delete text
     TODO: Add faded background image of Category Icon
+    TODO: Refactor navigation options
+    TODO: Move Sortable Label
  */
 
-// const Sortable = (WrappedComponent) => {
-//     return class extends Component {
-//         constructor(props) {
-//             super(props);
-//
-//             this._active = new Animated.Value(0);
-//
-//             this._style = {
-//                 transform: [{
-//                     scale: this._active.interpolate({
-//                         inputRange: [0,1],
-//                         outputRange: [0,1.1]
-//                     })
-//                 }],
-//                 shadowRadius: this._active.interpolate({
-//                     inputRange: [0,1],
-//                     outputRange: [2,10]
-//                 })
-//             };
-//         }
-//
-//         componentWillReceiveProps(nextProps) {
-//             if( this.props.active !== nextProps.active ) {
-//                 Animated.timing(this._active, {
-//                     duration: 300,
-//                     easing: Easing.bounce,
-//                     toValue: Number(nextProps.active)
-//                 }).start();
-//             }
-//         }
-//
-//         render() {
-//             const { data } = this.props;
-//             console.log(data);
-//             return (
-//                 <Animated.View style={this._style}>
-//                     <WrappedComponent title={ data.title } icon={ data.icon }/>
-//                 </Animated.View>
-//             )
-//         }
-//     }
-// };
-//
-// const SortableCategory = Sortable(CategoryLabel);
+class SortableLabel extends Component {
+    render() {
+        return <CategoryLabel title={ this.props.data.title } icon={ this.props.data.icon } handlers={this.props.sortHandlers} />
+    }
+}
 
 class CategoryList extends Component {
 
-    static navigationOptions = ({ navigation }) => ({
-        title: 'Categories',
-        headerStyle: header,
-        headerLeft: <TouchableOpacity onPress={ () => navigation.navigate('DrawerOpen') }>
-                        <Icon name="google" style={ headerLeft }/>
-                    </TouchableOpacity>,
-        headerRight: <Icon name="plus" style={ headerRight } />
-    });
-
-    keyExtractor = item => item.id;
-
-    renderBox = ({ item: { title, icon } }) => {
-        return <CategoryLabel title={title} icon={icon} />
+    static navigationOptions = ({ navigation }) => {
+        const showAdd = navigation.state.params && !navigation.state.params.cancel ?
+                            navigation.state.params.showAddCategory :
+                            undefined;
+        const cancel = navigation.state.params && navigation.state.params.cancel ?
+                            navigation.state.params.dismiss :
+                            undefined;
+        const rightButton = navigation.state.params && !navigation.state.params.cancel ?
+                                <Icon name="plus" style={ headerRight }/>:
+                                <Text style={ headerRight }>Cancel</Text>;
+        return {
+            title: 'Categories',
+            headerStyle: header,
+            headerLeft: <TouchableOpacity onPress={ () => navigation.navigate('DrawerOpen') }>
+                            <Icon name="google" style={ headerLeft }/>
+                        </TouchableOpacity>,
+            headerRight: <TouchableOpacity onPress={ showAdd || cancel }>
+                            { rightButton }
+                         </TouchableOpacity>
+        }
     };
 
-    showAlert(item) {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            text: ''
+        };
+
+        this.showAddCategory = this.showAddCategory.bind(this);
+        this.dismissAlert = this.dismissAlert.bind(this);
+        this.updateNavBar = this.updateNavBar.bind(this);
+    }
+
+    componentDidMount() {
+        this.props.navigation.setParams({
+            showAddCategory: this.showAddCategory,
+            dismiss: this.dismissAlert
+        })
+    }
+
+    dismissAlert() {
+        this.dropdown.dismiss();
+        this.updateNavBar('');
+    };
+
+    showAddCategory() {
         this.dropdown.alertWithType();
     }
 
-    dismissAlert = () => {
-        this.dropdown.dismiss()
-    };
+    updateNavBar(text) {
+        this.setState({ text });
+        if( this.state.text >= 1 ) return;
+        this.props.navigation.setParams({
+            cancel: !!text.length,
+            dismiss: this.dismissAlert
+        });
+    }
 
     render() {
         return (
             <View style={ screenWrapper }>
-                <FlatList
-                    data={data}
-                    keyExtractor={ this.keyExtractor }
-                    renderItem={ this.renderBox }
-                    showsVerticalScrollIndicator={false}
-                />
-                <DropdownAlert
-                    ref={(ref) => this.dropdown = ref }
-                    containerStyle={{
-                        backgroundColor: 'red',
+                <SortableListView
+                    style={{ flex: 1, marginBottom: 0 }}
+                    data={ dataObj }
+                    order={ keys }
+                    activeOpacity={ 0.6 }
+                    onRowMoved={e => {
+                        keys.splice(e.to, 0, keys.splice(e.from, 1)[0]);
+                        this.forceUpdate();
                     }}
+                    renderRow={row => <SortableLabel data={row} />}
                 />
-                {/*<TouchableOpacity onPress={() => this.showAlert() }>*/}
-                    {/*<Text>Open</Text>*/}
-                {/*</TouchableOpacity>*/}
-                {/*<TouchableOpacity onPress={() => this.dismissAlert() }>*/}
-                    {/*<Text>Close</Text>*/}
-                {/*</TouchableOpacity>*/}
+                <Dropdown
+                    ref={(ref) => this.dropdown = ref }
+                    containerStyle={ dropdownContainer }>
+                    <TextInput
+                        style={ dropdownInput }
+                        placeholder={ 'Add a new category...'}
+                        placeholderTextColor={ '#ffffff' }
+                        onChangeText={ text => this.updateNavBar(text) }
+                        value={ this.state.text }
+                    />
+                </Dropdown>
             </View>
         )
     }

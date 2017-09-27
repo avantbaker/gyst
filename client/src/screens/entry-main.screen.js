@@ -1,21 +1,29 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { graphql, compose } from 'react-apollo';
 import {
     Text,
     View,
     StyleSheet,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 } from 'react-native';
+
 import moment from 'moment';
 import Box from '../components/category-box.component';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { USER_QUERY } from "../graphql/user.query";
 
 const styles = StyleSheet.create({
     screenWrapper: {
         backgroundColor: 'white',
         padding: 20,
         paddingBottom: 30,
+        flex: 1
+    },
+    loading: {
+        justifyContent: 'center',
         flex: 1
     },
     container: {
@@ -115,10 +123,6 @@ const data = [
 ];
 
 /*
-    TODO: Create the Detail Screen
-    TODO: Create the Analytics Screen
-    TODO: Add click action to Left Header and Right Header. Action should launch a Drawer menu
-    TODO: Add click navigation for Boxes to go to their Detail Page
     TODO: Shrink the Header Size
  */
 
@@ -164,13 +168,25 @@ class Home extends Component {
     };
 
     render() {
+        const { loading, user } = this.props;
+
+        console.log(user);
+
+        if(loading) {
+            return (
+                <View style={[ screenWrapper, styles.loading ]}>
+                    <ActivityIndicator />
+                </View>
+            );
+        }
+
         return (
             <View style={ screenWrapper }>
                 <View style={ dateContainer }>
                     <Text style={ dateText }> { moment().format("MMM Do YYYY") } </Text>
                 </View>
                 <FlatList
-                    data={data}
+                    data={ user.categories }
                     contentContainerStyle={ container }
                     keyExtractor={ this.keyExtractor }
                     renderItem={ this.renderBox }
@@ -181,4 +197,9 @@ class Home extends Component {
     }
 }
 
-export default Home;
+const userQuery = graphql(USER_QUERY, {
+    options: ownProps => ({ variables: { id: 1 }}),
+    props: ({data: { loading, user }}) => ({ loading, user })
+});
+
+export default userQuery(Home);

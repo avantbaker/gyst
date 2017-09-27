@@ -6,18 +6,14 @@ import { createServer } from 'http';
 
 import { Schema } from './data/schema';
 import { Mocks } from './data/mocks';
+import Resolvers from "./data/resolvers";
 
 const GRAPHQL_PORT = 8080;
 const app = express();
 
 const executableSchema = makeExecutableSchema({
-    typeDefs: Schema
-});
-
-addMockFunctionsToSchema({
-    schema: executableSchema,
-    mocks: Mocks,
-    preserveResolvers: true
+    typeDefs: Schema,
+    resolvers: Resolvers
 });
 
 // 'Context' must be an object and can't be undefined when using connectors
