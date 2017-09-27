@@ -22,10 +22,16 @@
     "nodemon": "^1.12.1"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
     "body-parser": "^1.18.1",
     "express": "^4.15.4",
+    "faker": "^4.1.0",
     "graphql": "^0.11.3",
+    "graphql-date": "^1.0.3",
     "graphql-server-express": "^1.1.2",
-    "graphql-tools": "^1.2.2"
+    "graphql-tools": "^1.2.2",
+    "lodash": "^4.17.4",
+    "sequelize": "^4.11.0",
+    "sqlite3": "^3.1.12"
   }
 }

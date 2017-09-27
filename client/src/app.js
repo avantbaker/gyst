@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ApolloProvider } from 'react-apollo';
-// import Reactotron from 'reactotron-react-native';
-// import { reactotronRedux } from 'reactotron-redux';
+import Reactotron from 'reactotron-react-native';
+import { reactotronRedux } from 'reactotron-redux';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import AppWithNavigationState, { navigationReducer } from "./navigation";
@@ -16,15 +16,15 @@ export const client = new ApolloClient({
     networkInterface
 });
 
-// Reactotron
-//     .configure({
-//         name: 'Gylt'
-//     }) // controls connection & communication settings
-//     .useReactNative()
-//     .use(reactotronRedux()) // add all built-in react native plugins // let's connect!
-//     .connect();
+Reactotron
+    .configure({
+        name: 'Gylt'
+    }) // controls connection & communication settings
+    .useReactNative()
+    .use(reactotronRedux()) // add all built-in react native plugins // let's connect!
+    .connect();
 
-const store = createStore(
+const store = Reactotron.createStore(
     combineReducers({
         apollo: client.reducer(),
         nav: navigationReducer
