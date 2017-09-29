@@ -5,19 +5,23 @@ export const Schema = [`
         id: Int!
         title: String, 
         icon: String
+        itemsLeft: [Todo]
     }
     
     type Entry {
         id: Int!
-        userId: Int!
+        incompleteTodos: [Todo]
+        user: User!
         todos: [Todo]
     }
     
     type User {
         id: Int!
+        email: String
+        username: String
         categories: [Category]!
         entries: [Entry]
-        email: String
+        todos: [Todo]
     }
     
     type Todo {
@@ -35,6 +39,7 @@ export const Schema = [`
         entry(id: Int, userId: Int!, date: Date): Entry
         categories(userId: Int!): [Category]
         allTodos(userId: Int!): [Todo]
+        allEntries(userId: Int!): [Entry]
     }
         
     schema {

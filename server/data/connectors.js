@@ -21,6 +21,11 @@ db.authenticate()
 const TodoModel = db.define('todo', {
     title: { type: Sequelize.STRING },
     description: { type: Sequelize.STRING },
+    complete: { type: Sequelize.BOOLEAN }
+});
+
+const TodoCategory = db.define( 'TodoCategory', {
+    itemsLeft: { type: Sequelize.INTEGER }
 });
 
 const CategoryModel = db.define( 'category', {
@@ -34,48 +39,40 @@ const UserModel = db.define('user', {
     password: { type: Sequelize.STRING }
 });
 
-const EntryModel = db.define( 'entry', {
-    userId: { type: Sequelize.INTEGER }
-});
+const EntryModel = db.define( 'entry' );
 
-// User has Many Entries
-// Entries belong to a User
-// UserModel.hasMany(EntryModel); // entry has a user_id column now
-// UserModel.hasMany(CategoryModel); // category has a user_id column now
-// UserModel.hasMany(TodoModel); // to_do has a user_id column now
-//
-// EntryModel.hasMany(TodoModel, { through: UserModel });
-// EntryModel.belongsTo( UserModel, { through: 'UserEntry' });
-// CategoryModel.belongsToMany( UserModel, { through: 'UserCategory' });
-//
-// //Todos belong to a User
-// TodoModel.belongsTo( UserModel, { through: 'TodoUser' });
-//
-// // Todos belong to an Entry
-// TodoModel.belongsTo( EntryModel, { through: 'TodoEntry' });
-//
-// // Todos belong to a Category
-// TodoModel.belongsTo( CategoryModel, { through: 'TodoCategory', as: 'todocategory' });
+UserModel.belongsToMany( CategoryModel, { through: 'UserCategory' });        // category has a user_id column now
 
-// Entry belongs to a user
-EntryModel.belongsTo( UserModel, { through: 'EntryUser' });
+UserModel.hasMany(EntryModel);                                               // entry has a user_id column now
 
-// Category belongs to a user
-CategoryModel.belongsTo( UserModel, { through: 'CategoryUser' });
+UserModel.hasMany(TodoModel);
 
-//Todos belong to a User
-TodoModel.belongsTo( UserModel, { through: 'TodoUser' });
+CategoryModel.hasOne(TodoModel, { as: 'Category', foreignKey: 'catId' });
 
-// Todos belong to an Entry
-TodoModel.belongsTo( EntryModel, { through: 'TodoEntry' });
+CategoryModel.belongsToMany( UserModel, { through: 'UserCategory' });
 
-// Todos belong to a Category
-TodoModel.belongsTo( CategoryModel, { through: 'TodoCategory', as: 'todocategory' });
+EntryModel.belongsToMany( TodoModel, { through: TodoCategory } );
+
+TodoModel.belongsTo( EntryModel, { through: TodoCategory } );
+
+TodoModel.belongsTo( CategoryModel, { foreignKey: 'catId' } );
+
 
 const USERS = 1;
 const ENTRIES_PER_USER = 4;
-const TODOS_PER_ENTRY = 13;
 const PASSWORD = faker.internet.password();
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function randomizeBoolean() {
+    const randomNumber = getRandomInt(0,100);
+    return !!(randomNumber % 2);
+}
+
 faker.seed(123);
 
 
@@ -134,40 +131,61 @@ db.sync({ force: true }).then(() => {
                     itemsLeft: 3
                 }
             ];
-            const user_categories = [];
-            const CATEGORIES_PER_USER = data.length;
             const buildCategories = Promise.resolve();
-
-            function getRandomInt(min, max) {
-                min = Math.ceil(min);
-                max = Math.floor(max);
-                return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-            }
 
             buildCategories.then(() => {
                 return Promise.all(_.map(data, category => {
                     category.userId = 1;
-                    return CategoryModel.create(category).then(category => {
+                    return user.createCategory(category).then(category => {
                         return category;
                     })
                 })).then(categories => {
                     _.times(ENTRIES_PER_USER, () => {
-                        return EntryModel.create({
-                            userId: user.id
+                        let TODOS_PER_ENTRY = getRandomInt(0, 20);
+                        return user.createEntry({
+                            userId: user.id,
                         }).then(entry => {
-                            _.times(13, () => {
-                                return TodoModel.create({
+                            _.times(TODOS_PER_ENTRY, () => {
+                                return user.createTodo({
                                     title: faker.lorem.words(3),
                                     description: faker.lorem.sentence(),
+                                    complete: randomizeBoolean(),
                                     entryId: entry.id,
-                                    categoryId: getRandomInt(0,9),
-                                    user: user
-                                });
+                                    catId: categories[getRandomInt(0, 8)].id
+                                })
                             });
                         })
                     });
                 });
             });
+            //
+            // buildCategories.then(() => {
+            //     _.times(ENTRIES_PER_USER, () => {
+            //         let TODOS_PER_ENTRY = getRandomInt(0, 20);
+            //         return user.createEntry({
+            //             userId: user.id,
+            //         }).then(entry => {
+            //             Promise.all(_.map(data, category => {
+            //                 category.userId = user.id;
+            //                 return user.createCategory(category).then(category => {
+            //                     return category;
+            //                 })
+            //             })).then(categories => {
+            //                 _.times(TODOS_PER_ENTRY, () => {
+            //                     return user.createTodo({
+            //                         title: faker.lorem.words(3),
+            //                         description: faker.lorem.sentence(),
+            //                         complete: randomizeBoolean(),
+            //                         entryId: entry.id,
+            //                         catId: categories[getRandomInt(0, 8)].id
+            //                     })
+            //                 });
+            //             })
+            //         })
+            //     });
+            // });
+
+
             return user;
         })
     })

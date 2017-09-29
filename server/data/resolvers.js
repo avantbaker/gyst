@@ -5,73 +5,65 @@ import GraphQLDate from 'graphql-date';
 export const Resolvers = {
     Date: GraphQLDate,
     Query: {
-        user( _, {id}) {
-            console.log(id);
-            return User.findOne({ where: { id }});
+        user( _, args ) {
+            return User.findOne({ where: args});
         },
-        entry(_, { id, userId }) {
-            return Entry.findOne({ where: { id, userId }})
+        entry( _, args ) {
+            return Entry.findOne({ where: args })
         },
-        categories(_, { userId }) {
-            return Category.findOne({ where: { userId }})
+        categories( _, args ) {
+            return Category.findAll({ where: args })
         },
-        allTodos(_, { userId }) {
-            return Todo.findAll().then(todos => {
-                console.log(todos);
-                return todos;
-            })
-        }
     },
     User: {
+        todos(user) {
+            return user.getTodos();
+        },
         entries(user) {
-            return Entry.findAll({
-                where: { userId: user.id },
-            });
+            return user.getEntries();
         },
         categories(user) {
-            return Category.findAll({
-                where: { userId: user.id }
-            });
+            return user.getCategories();
         },
+        email(user) {
+            return user.email;
+        },
+        username(user) {
+            return user.username;
+        }
     },
     Entry: {
         todos(entry) {
-            return Todo.findAll({ where: { entryId: entry.id } })
+            return entry.getTodos();
         },
-        userId(entry) {
-            return User.findOne({ where: { id: entry.userId }})
-                        .then(user => {
-                            return user.id;
-                        });
+        user(entry) {
+            return entry.getUser();
+        },
+        incompleteTodos(entry) {
+            return Todo.findAll({
+                where: { entryId: entry.id, complete: { $not: true } }
+            })
         }
     },
     Todo: {
         title(todo) {
-            return Todo.findOne({ where: { id: todo.id }})
-                        .then( todo => {
-                            return todo.title;
-                        });
+            return todo.title;
         },
         description(todo) {
-            return Todo.findOne({ where: { id: todo.id }})
-                    .then( todo => {
-                        return todo.description;
-                    });
+            return todo.description
         },
-        // category(todo) {
-        //     return Todo.findOne({ where: { id: todo.id } })
-        //         .then(todo => {
-        //             return todo.category
-        //         });
-        // },
+        category(todo) {
+            return todo.getCategory();
+        },
         entry(todo) {
-            return Todo.findOne({ where: { id: todo.id }})
-                .then( todo => {
-                    console.log(todo);
-                    return Entry.findOne({where: {
-                        id: todo.entryId
-                    }});
-                });
+            return todo.getEntry();
+        }
+    },
+    Category: {
+        itemsLeft(category) {
+            return Todo.findAll({
+                where: { catId: category.id, complete: { $not: true } }
+            })
         }
     }
 };
