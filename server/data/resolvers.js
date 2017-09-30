@@ -1,6 +1,7 @@
 // server/data/resolvers.js
 import { User, Category, Entry, Todo } from './connectors';
 import GraphQLDate from 'graphql-date';
+import { _ } from 'lodash';
 
 export const Resolvers = {
     Date: GraphQLDate,
@@ -42,7 +43,7 @@ export const Resolvers = {
         incompleteTodos(entry) {
             return Todo.findAll({
                 where: { entryId: entry.id, complete: { $not: true } }
-            })
+            });
         }
     },
     Todo: {

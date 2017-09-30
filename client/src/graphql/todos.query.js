@@ -1,20 +1,18 @@
 import gql from 'graphql-tag';
 
-export const USER_QUERY = gql`
+export const TODO_QUERY = gql`
        query user($id: Int) {
             user(id: $id) {
-                categories {
-                  id
-                  title
-                  icon
-                }
                 entries {
                   id
-                  incompleteTodos {
-                    category {
-                      id
-                    }
+                  todos {
+                    id
+                    title
+                    description
                     complete
+                    category {
+                        id
+                    }
                   }
                 }
             }

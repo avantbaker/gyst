@@ -4,12 +4,16 @@ import {
     View,
     StyleSheet,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 } from 'react-native';
+import { graphql } from 'react-apollo';
+import { _ } from 'lodash';
+
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
 import Todo from '../components/todo-item.component';
+import {TODO_QUERY} from "../graphql/todos.query";
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -102,13 +106,28 @@ class CategoryDetail extends Component {
     };
 
     render() {
+
+        const { loading, user, navigation } = this.props;
+
+        if(loading) {
+            return (
+                <View style={[screenWrapper, styles.loading]}>
+                    <ActivityIndicator/>
+                </View>
+            );
+        }
+
+        const { todos } = user.entries[0];
+
+        const data = _.filter( todos, todo => todo.category.id === navigation.state.params.id );
+
         return (
             <View style={ screenWrapper }>
                 <View style={ dateContainer }>
                     <Text style={ dateText }> { moment().format("MMM Do YYYY") } </Text>
                 </View>
                 <FlatList
-                    data={data}
+                    data={ data }
                     keyExtractor={ this.keyExtractor }
                     renderItem={ this.renderBox }
                     showsVerticalScrollIndicator={false}
@@ -118,4 +137,9 @@ class CategoryDetail extends Component {
     }
 }
 
-export default CategoryDetail;
+const todoQuery = graphql( TODO_QUERY, {
+    options: ownProps => ({ variables: { id: 1 }}),
+    props: ({data: { loading, user }}) => ({ loading, user })
+});
+
+export default todoQuery(CategoryDetail);
