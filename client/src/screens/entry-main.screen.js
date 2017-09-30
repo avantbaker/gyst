@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     ActivityIndicator
 } from 'react-native';
-
+import { _ } from 'lodash';
 import moment from 'moment';
 import Box from '../components/category-box.component';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -65,63 +65,20 @@ const {
     dateText
 } = styles;
 
-const data = [
-    {
-        id: 1,
-        icon: "users",
-        title: "Family",
-        itemsLeft: 2
-    },
-    {
-        id: 2,
-        icon: "odnoklassniki",
-        title: "Fitness",
-        itemsLeft: 1
-    },
-    {
-        id: 3,
-        icon: "leaf",
-        title: "Health",
-        itemsLeft: 0
-    },
-    {
-        id: 4,
-        icon: "home",
-        title: "Home",
-        itemsLeft: 3
-    },
-    {
-        id: 5,
-        icon: "shopping-bag",
-        title: "Fashion",
-        itemsLeft: 0
-    },
-    {
-        id: 6,
-        icon: "reddit",
-        title: "Personal",
-        itemsLeft: 0
-    },
-    {
-        id: 7,
-        icon: "heart",
-        title: "Love",
-        itemsLeft: 1
-    },
-    {
-        id: 8,
-        icon: "code-fork",
-        title: "Work",
-        itemsLeft: 3
-    },
-    {
-        id: 9,
-        icon: "btc",
-        title: "Finance",
-        itemsLeft: 1
-    }
-];
-
+function filterCategoriesForItemsLeft( allCategories, incompleteTodos ) {
+    // Group the Incomplete To_dos;
+    let sorted = _.groupBy( incompleteTodos, 'category.id' );
+    return _.map( allCategories, ( category ) => {
+        // if the current category isn't present in sorted than skip
+        if( !sorted[category.id] ) {
+            category = Object.assign({}, category, { itemsLeft: 0 });
+            return category;
+        }
+        // sorted count to items left category
+        category = Object.assign({}, category, { itemsLeft: sorted[category.id].length });
+        return category;
+    });
+}
 /*
     TODO: Shrink the Header Size
  */
@@ -170,8 +127,6 @@ class Home extends Component {
     render() {
         const { loading, user } = this.props;
 
-        console.log(user);
-
         if(loading) {
             return (
                 <View style={[ screenWrapper, styles.loading ]}>
@@ -180,13 +135,18 @@ class Home extends Component {
             );
         }
 
+        // Get first Entries incomplete to_dos
+        let { incompleteTodos } = user.entries[0];
+
+        let data = filterCategoriesForItemsLeft(user.categories, incompleteTodos);
+
         return (
             <View style={ screenWrapper }>
                 <View style={ dateContainer }>
                     <Text style={ dateText }> { moment().format("MMM Do YYYY") } </Text>
                 </View>
                 <FlatList
-                    data={ user.categories }
+                    data={ data }
                     contentContainerStyle={ container }
                     keyExtractor={ this.keyExtractor }
                     renderItem={ this.renderBox }

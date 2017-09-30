@@ -3,9 +3,9 @@ export const Schema = [`
     
     type Category {
         id: Int!
-        title: String, 
+        title: String,
         icon: String
-        itemsLeft: [Todo]
+        itemsLeft: [[Todo]]
     }
     
     type Entry {

@@ -146,7 +146,7 @@ db.sync({ force: true }).then(() => {
                             userId: user.id,
                         }).then(entry => {
                             _.times(TODOS_PER_ENTRY, () => {
-                                return user.createTodo({
+                                return entry.createTodo({
                                     title: faker.lorem.words(3),
                                     description: faker.lorem.sentence(),
                                     complete: randomizeBoolean(),
@@ -158,34 +158,6 @@ db.sync({ force: true }).then(() => {
                     });
                 });
             });
-            //
-            // buildCategories.then(() => {
-            //     _.times(ENTRIES_PER_USER, () => {
-            //         let TODOS_PER_ENTRY = getRandomInt(0, 20);
-            //         return user.createEntry({
-            //             userId: user.id,
-            //         }).then(entry => {
-            //             Promise.all(_.map(data, category => {
-            //                 category.userId = user.id;
-            //                 return user.createCategory(category).then(category => {
-            //                     return category;
-            //                 })
-            //             })).then(categories => {
-            //                 _.times(TODOS_PER_ENTRY, () => {
-            //                     return user.createTodo({
-            //                         title: faker.lorem.words(3),
-            //                         description: faker.lorem.sentence(),
-            //                         complete: randomizeBoolean(),
-            //                         entryId: entry.id,
-            //                         catId: categories[getRandomInt(0, 8)].id
-            //                     })
-            //                 });
-            //             })
-            //         })
-            //     });
-            // });
-
-
             return user;
         })
     })
