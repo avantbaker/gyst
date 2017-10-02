@@ -8,11 +8,10 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar } from 'react-native-calendars';
-import Box from '../components/category-box.component';
-import FullWidthButton from "../components/full-width-button.component";
 import moment from 'moment';
 
-// import ProgressBar from '../components/progress-bar.component';
+import Box from '../components/category-box.component';
+import FullWidthButton from "../components/full-width-button.component";
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -52,7 +51,6 @@ const styles = StyleSheet.create({
         marginBottom: 8
     }
 });
-
 const calendarTheme =  {
     selectedDayBackgroundColor: 'black',
     selectedDayTextColor: 'white',
@@ -72,6 +70,10 @@ const {
 
 /*
     TODO: Create Component for the inner Content on this pages boxes
+    TODO: Integrate with current Entry stats
+    TODO: Calculate Total stats
+    TODO: create all incomplete todo pages
+    TODO: add ability to view TODO by date
  */
 
 class Analytics extends Component {

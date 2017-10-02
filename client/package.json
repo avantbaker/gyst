@@ -16,6 +16,7 @@
     "react-apollo": "^1.4.15",
     "react-native": "0.48.3",
     "react-native-calendars": "^1.6.2",
+    "react-native-collapsible": "^0.9.0",
     "react-native-sortable-list": "0.0.16",
     "react-native-sortable-listview": "^0.2.6",
     "react-native-swipeout": "^2.2.2",
