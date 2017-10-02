@@ -41,20 +41,20 @@ const UserModel = db.define('user', {
 
 const EntryModel = db.define( 'entry' );
 
+// User Model Relationships
 UserModel.belongsToMany( CategoryModel, { through: 'UserCategory' });        // category has a user_id column now
-
 UserModel.hasMany(EntryModel);                                               // entry has a user_id column now
-
 UserModel.hasMany(TodoModel);
 
+// Category Model Relationships
 CategoryModel.hasOne(TodoModel, { as: 'Category', foreignKey: 'catId' });
-
 CategoryModel.belongsToMany( UserModel, { through: 'UserCategory' });
 
+// Entry Model Relationships
 EntryModel.belongsToMany( TodoModel, { through: TodoCategory } );
 
+// To do Model Relationships
 TodoModel.belongsTo( EntryModel, { through: TodoCategory } );
-
 TodoModel.belongsTo( CategoryModel, { foreignKey: 'catId' } );
 
 

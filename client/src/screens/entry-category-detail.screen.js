@@ -8,7 +8,7 @@ import {
     ActivityIndicator,
     TextInput
 } from 'react-native';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import { _ } from 'lodash';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -17,6 +17,7 @@ import Todo from '../components/todo-item.component';
 import Dropdown from '../components/dropdown.component';
 
 import { TODO_QUERY } from "../graphql/todos.query";
+import { CREATE_TODO_MUTATION } from "../graphql/create-todo.mutation";
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -52,9 +53,9 @@ const styles = StyleSheet.create({
     },
     dropdownContainer: {
         backgroundColor: 'black',
-        paddingBottom: 10,
+        paddingBottom: 20,
         paddingLeft: 20,
-        paddingRight: 20
+        paddingTop: 12
     },
     dropdownInput: {
         height: 40,
@@ -77,12 +78,10 @@ const {
 } = styles;
 
 /*
-    TODO: create mutation to add new Todo Item to Category
+    TODO: ( later ) non collapsed state on the newly added todo
     TODO: add subtext to display swipe to delete text
     TODO: Add faded background image of Category Icon
-    TODO: Give bottom padding to the input dropdown
     TODO: Create Overlay that launches when the dropdown comes down
-    TODO: Put add todo button within the dropdown and change the + to cancel
  */
 
 class CategoryDetail extends Component {
@@ -97,7 +96,7 @@ class CategoryDetail extends Component {
                                 undefined;
         const rightButton   = navigation.state.params && !navigation.state.params.cancel ?
                                 <Icon name="plus" style={ headerRight }/> :
-                                <Text style={ headerRight }>Cancel</Text>;
+                                <Text style={ [headerRight, { fontSize: 17, fontWeight: 'bold' } ] }>Cancel</Text>;
 
         return {
             title: navigation.state.params ? navigation.state.params.title : "Category",
@@ -121,12 +120,12 @@ class CategoryDetail extends Component {
         this.showAddCategory = this.showAddCategory.bind(this);
         this.updateNavBar = this.updateNavBar.bind(this);
         this.dismissAlert = this.dismissAlert.bind(this);
+        this.createTodo = this.createTodo.bind(this);
     }
 
     keyExtractor = item => item.id;
 
     renderBox = ({ item: { title, description, complete } }) => {
-        console.log(complete);
         return <Todo title={title} description={description} complete={complete} />
     };
 
@@ -139,20 +138,37 @@ class CategoryDetail extends Component {
 
     dismissAlert() {
         this.dropdown.dismiss();
-        this.updateNavBar('');
+        this.props.navigation.setParams({
+            cancel: false,
+        })
     };
 
     showAddCategory() {
         this.dropdown.alertWithType();
+        this.props.navigation.setParams({
+            cancel: true,
+            dismissAlert: this.dismissAlert()
+        })
     }
 
     updateNavBar(text) {
         this.setState({ text });
-        if( this.state.text >= 1 ) return;
-        this.props.navigation.setParams({
-            cancel: !!text.length,
-            dismiss: this.dismissAlert
+    }
+
+    createTodo() {
+        const { createTodo, navigation, user } = this.props;
+        const { text } = this.state;
+
+        createTodo({
+            title: text,
+            description: 'Something goes heree',
+            userId: user.id,
+            categoryId: navigation.state.params.categoryId,
+            entryId: navigation.state.params.entryId
         });
+
+        this.dismissAlert();
+
     }
 
     getTodos(todos) {
@@ -195,6 +211,11 @@ class CategoryDetail extends Component {
                         onChangeText={ text => this.updateNavBar(text) }
                         value={ this.state.text }
                     />
+                    <TouchableOpacity onPress={ this.createTodo }>
+                        <View style={{ width: 60, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Icon name="plus" style={{color: 'white', fontSize: 30}}/>
+                        </View>
+                    </TouchableOpacity>
                 </Dropdown>
             </View>
         )
@@ -206,4 +227,33 @@ const todoQuery = graphql( TODO_QUERY, {
     props: ({data: { loading, user }}) => ({ loading, user })
 });
 
-export default todoQuery(CategoryDetail);
+const createTodo = graphql( CREATE_TODO_MUTATION, {
+    props: ({ownProps, mutate}) => ({
+        createTodo: (args) => mutate({
+            variables: args,
+            update: (store, { data: { createTodo }}) => {
+                // Get current cached data
+                const data = store.readQuery({
+                    query: TODO_QUERY,
+                    variables: {
+                        id: 1
+                    }
+                });
+                // add the completion status to the to do for the Optimistic UI update
+                createTodo.complete = false;
+                // add the to do to the list of cached todos
+                data.user.entries[0].todos.push(createTodo);
+                // Re write to the cache
+                store.writeQuery({
+                    query: TODO_QUERY,
+                    variables: {
+                        id: 1
+                    },
+                    data
+                });
+            }
+        })
+    })
+});
+
+export default compose( todoQuery, createTodo )(CategoryDetail);
