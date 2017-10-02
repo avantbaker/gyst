@@ -8,7 +8,6 @@ import {
 
 let styles = StyleSheet.create({
     defaultContainer: {
-        padding: 8,
         flexDirection: 'row'
     },
     textContainer: {

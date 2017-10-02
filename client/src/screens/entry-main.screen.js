@@ -92,12 +92,13 @@ class Home extends Component {
     keyExtractor = item => item.id;
 
     goToCategoryDetail(category) {
-        const { navigate } = this.props.navigation;
+        const { navigate, user } = this.props.navigation;
 
         navigate('DetailsScreen', {
             id: category.id,
             title: category.title,
-            from: 'HomeScreen'
+            categoryId: category.id,
+            entryId: this.props.user.entries[0].id
         })
     }
 

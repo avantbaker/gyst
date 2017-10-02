@@ -45,6 +45,10 @@ const styles = StyleSheet.create({
         padding: 3,
         alignItems: 'stretch',
         flexDirection: 'row'
+    },
+    todoCheckboxComplete: {
+        backgroundColor: 'black',
+        flex: 1
     }
 });
 
@@ -54,7 +58,8 @@ const {
     todoCheckboxWrapper,
     todoTitle,
     todoDescription,
-    todoCheckboxOuter
+    todoCheckboxOuter,
+    todoCheckboxComplete
 } = styles;
 
 /*
@@ -108,7 +113,9 @@ class Todo extends Component {
                     <TouchableOpacity onPress={ () => this.setState({ complete: !this.state.complete }) }>
                         <View style={ todoCheckboxWrapper }>
                             <View style={ todoCheckboxOuter }>
-                                { this.state.complete ? <View style={{ backgroundColor: 'black', flex: 1 }}><Text>T</Text></View> : null }
+                                { this.state.complete ?
+                                    <View style={ todoCheckboxComplete }><Text>X</Text></View> :
+                                    null }
                             </View>
                         </View>
                     </TouchableOpacity>

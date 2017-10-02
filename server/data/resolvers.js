@@ -16,6 +16,19 @@ export const Resolvers = {
             return Category.findAll({ where: args })
         },
     },
+    Mutation: {
+        createTodo(_, { title, description, userId, categoryId, entryId }){
+            return Todo.create({
+                title,
+                description,
+                userId,
+                catId: categoryId,
+                entryId,
+                complete: false
+            });
+        }
+
+    },
     User: {
         todos(user) {
             return user.getTodos();

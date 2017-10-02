@@ -41,9 +41,14 @@ export const Schema = [`
         allTodos(userId: Int!): [Todo]
         allEntries(userId: Int!): [Entry]
     }
+    
+    type Mutation {
+        createTodo(title: String!, description: String, userId: Int!, categoryId: Int!, entryId: Int!): Todo
+    }
         
     schema {
         query: Query
+        mutation: Mutation
     }
 `];
 
