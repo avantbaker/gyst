@@ -65,22 +65,10 @@ const {
     dateText
 } = styles;
 
-function filterCategoriesForItemsLeft( allCategories, incompleteTodos ) {
-    // Group the Incomplete To_dos;
-    let sorted = _.groupBy( incompleteTodos, 'category.id' );
-    return _.map( allCategories, ( category ) => {
-        // if the current category isn't present in sorted than skip
-        if( !sorted[category.id] ) {
-            category = Object.assign({}, category, { itemsLeft: 0 });
-            return category;
-        }
-        // sorted count to items left category
-        category = Object.assign({}, category, { itemsLeft: sorted[category.id].length });
-        return category;
-    });
-}
 /*
-    TODO: Shrink the Header Size
+    TODO: Add Create Entry for Today Screen when there isn't a current Entry
+    TODO: Integrate that screen with the creation of a new Entry
+    TODO: Connect header right button to Analytics page
  */
 
 class Home extends Component {
@@ -124,6 +112,22 @@ class Home extends Component {
         return <Box category={ item } onPress={ this.goToCategoryDetail } />
     };
 
+    filterCategoriesForItemsLeft( incompleteTodos ) {
+        const { user: { categories } } = this.props;
+        // Group the Incomplete To_dos;
+        let sorted = _.groupBy( incompleteTodos, 'category.id' );
+        return _.map( categories, ( category ) => {
+            // if the current category isn't present in sorted than skip
+            if( !sorted[category.id] ) {
+                category = Object.assign({}, category, { itemsLeft: 0 });
+                return category;
+            }
+            // sorted count to items left category
+            category = Object.assign({}, category, { itemsLeft: sorted[category.id].length });
+            return category;
+        });
+    }
+
     render() {
         const { loading, user } = this.props;
 
@@ -138,15 +142,13 @@ class Home extends Component {
         // Get first Entries incomplete to_dos
         let { incompleteTodos } = user.entries[0];
 
-        let data = filterCategoriesForItemsLeft(user.categories, incompleteTodos);
-
         return (
             <View style={ screenWrapper }>
                 <View style={ dateContainer }>
                     <Text style={ dateText }> { moment().format("MMM Do YYYY") } </Text>
                 </View>
                 <FlatList
-                    data={ data }
+                    data={ this.filterCategoriesForItemsLeft(incompleteTodos) }
                     contentContainerStyle={ container }
                     keyExtractor={ this.keyExtractor }
                     renderItem={ this.renderBox }
@@ -161,5 +163,10 @@ const userQuery = graphql(USER_QUERY, {
     options: ownProps => ({ variables: { id: 1 }}),
     props: ({data: { loading, user }}) => ({ loading, user })
 });
+
+Home.propTypes = {
+  user: PropTypes.object,
+  loading: PropTypes.bool
+};
 
 export default userQuery(Home);

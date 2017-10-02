@@ -4,8 +4,10 @@ import {
     Text,
     View,
     StyleSheet,
-    Dimensions
+    Dimensions,
+    TouchableOpacity
 } from 'react-native';
+import Collapsible from 'react-native-collapsible';
 
 const { width } = Dimensions.get('window');
 
@@ -39,7 +41,10 @@ const styles = StyleSheet.create({
         height: 26,
         width: 26,
         borderColor: 'black',
-        borderWidth: 1
+        borderWidth: 1,
+        padding: 3,
+        alignItems: 'stretch',
+        flexDirection: 'row'
     }
 });
 
@@ -60,22 +65,55 @@ const {
 
 class Todo extends Component {
 
+    state = {
+        collapsed: true,
+        complete: this.props.complete || null
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.toggleDescription = this.toggleDescription.bind(this);
+        this.renderContent = this.renderContent.bind(this);
+    }
+
     elipsifyContent(prop, length){
         return prop.length > length ? prop.substr(0,length) + '...' : prop;
+    }
+
+    toggleDescription() {
+        this.setState({
+            collapsed: !this.state.collapsed
+        })
+    }
+
+    renderContent(content, length) {
+        return this.state.collapsed ? this.elipsifyContent(content, length) : content;
     }
 
     render() {
         const { title, description } = this.props;
         return (
-            <View style={ todoContainer}>
-                <View style={ todoContent }>
-                    <Text style={ todoTitle }>{ this.elipsifyContent(title, 34) }</Text>
-                    <Text style={ todoDescription }>{ this.elipsifyContent(description, 84) }</Text>
+            <TouchableOpacity onPress={ this.toggleDescription }>
+                <View style={ todoContainer}>
+                    <View style={ todoContent } >
+                        <Text style={ todoTitle }>{ this.renderContent(title, 34) }</Text>
+                        <Collapsible
+                            collapsed={ this.state.collapsed }
+                            collapsedHeight={ 35 }
+                            duration={ 1000 }>
+                            <Text style={ todoDescription }>{ this.renderContent(description, 74) }</Text>
+                        </Collapsible>
+                    </View>
+                    <TouchableOpacity onPress={ () => this.setState({ complete: !this.state.complete }) }>
+                        <View style={ todoCheckboxWrapper }>
+                            <View style={ todoCheckboxOuter }>
+                                { this.state.complete ? <View style={{ backgroundColor: 'black', flex: 1 }}><Text>T</Text></View> : null }
+                            </View>
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                <View style={ todoCheckboxWrapper }>
-                    <View style={ todoCheckboxOuter }></View>
-                </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 }

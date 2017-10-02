@@ -2,14 +2,10 @@ import React, { Component } from 'react';
 import {
     View,
     StyleSheet,
-    FlatList,
     TouchableOpacity,
-    Animated,
-    Easing,
     Text,
     TextInput,
     Dimensions,
-    TouchableHighlight
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryLabel from "../components/category-label.component";
@@ -74,13 +70,11 @@ const styles = StyleSheet.create({
 
 const {
     screenWrapper,
-    container,
     header,
     headerLeft,
     headerRight,
     dropdownContainer,
     dropdownInput,
-    row
 } = styles;
 
 const data = [
@@ -135,10 +129,15 @@ const keys = Array.apply(null, {length: data.length}).map(Number.call, Number);
 const dataObj = _.object(keys, data);
 
 /*
+    TODO: Create category delete mutation
+    TODO: Create category title edit mutation
+    TODO: Create category add mutation
     TODO: add subtext to display swipe to delete text
-    TODO: Add faded background image of Category Icon
     TODO: Refactor navigation options
-    TODO: Move Sortable Label
+    TODO: Move Sortable Label to its on file and make PureComponent
+    TODO: Move data transforming logic into a function
+    TODO: Fix swipe to delete text positioning and functionality
+    TODO: change X to left arrow
  */
 
 class SortableLabel extends Component {

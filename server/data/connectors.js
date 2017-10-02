@@ -148,7 +148,7 @@ db.sync({ force: true }).then(() => {
                             _.times(TODOS_PER_ENTRY, () => {
                                 return entry.createTodo({
                                     title: faker.lorem.words(3),
-                                    description: faker.lorem.sentence(),
+                                    description: faker.lorem.sentences(4),
                                     complete: randomizeBoolean(),
                                     entryId: entry.id,
                                     catId: categories[getRandomInt(0, 8)].id
