@@ -64,14 +64,14 @@ class FullWidthButton extends Component {
     render() {
         const { icon, title } = this.props;
         return (
-            <TouchableOpacity>
-                <View style={ buttonContainer }>
-                    <View style={ buttonContent }>
-                        <Icon name={ icon } style={ buttonIcon } />
-                        <Text style={ buttonTitle }>{ title }</Text>
+            <TouchableOpacity onPress={ () => this.props.onPress() }>
+                <View style={ [buttonContainer, this.props.style, this.props.containerStyle ] }>
+                    <View style={ [ buttonContent, this.props.contentStyle ] }>
+                        <Icon name={ icon } style={ [buttonIcon, this.props.leftIconStyle ] } />
+                        <Text style={ [ buttonTitle, this.props.titleStyle] }>{ title }</Text>
                     </View>
                     <View style={ buttonWrapper }>
-                        <Icon style={ buttonArrow } name="arrow-right" />
+                        <Icon style={ [ buttonArrow, this.props.rightIconStyle ] } name="arrow-right" />
                     </View>
                 </View>
             </TouchableOpacity>
