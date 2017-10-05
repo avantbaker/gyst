@@ -98,7 +98,8 @@ class Home extends Component {
             id: category.id,
             title: category.title,
             categoryId: category.id,
-            entryId: this.props.user.entries[0].id
+            entryId: this.props.user.entries[0].id,
+            refetch: this.props.refetch.bind(this)
         })
     }
 
@@ -161,8 +162,15 @@ class Home extends Component {
 }
 
 const userQuery = graphql(USER_QUERY, {
-    options: ownProps => ({ variables: { id: 1 }}),
-    props: ({data: { loading, user }}) => ({ loading, user })
+    options: ownProps => ({
+        variables: { id: 1 },
+        updateQuery:( prev, { fetchMoreResult }) => {
+            return Object.assign({}, prev, {
+                user: fetchMoreResult.user
+            });
+        }
+    }),
+    props: ({data: { loading, user, refetch }}) => ({ loading, user, refetch })
 });
 
 Home.propTypes = {

@@ -8,6 +8,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 import Collapsible from 'react-native-collapsible';
+import FullWidthButton from "./full-width-button.component";
 
 const { width } = Dimensions.get('window');
 
@@ -35,7 +36,8 @@ const styles = StyleSheet.create({
         marginBottom: 4
     },
     todoDescription: {
-        fontSize: 12.5
+        fontSize: 12.5,
+        marginBottom: 8
     },
     todoCheckboxOuter: {
         height: 26,
@@ -108,6 +110,10 @@ class Todo extends Component {
                             collapsedHeight={ 35 }
                             duration={ 1000 }>
                             <Text style={ todoDescription }>{ this.renderContent(description, 74) }</Text>
+                            <FullWidthButton
+                                title="Edit Item"
+                                style={{ marginBottom: 2 }}
+                            />
                         </Collapsible>
                     </View>
                     <TouchableOpacity onPress={ () => this.setState({ complete: !this.state.complete }) }>

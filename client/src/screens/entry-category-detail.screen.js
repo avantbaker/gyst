@@ -18,6 +18,7 @@ import Dropdown from '../components/dropdown.component';
 
 import { TODO_QUERY } from "../graphql/todos.query";
 import { CREATE_TODO_MUTATION } from "../graphql/create-todo.mutation";
+import FullWidthButton from "../components/full-width-button.component";
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         paddingBottom: 20,
         paddingLeft: 20,
+        paddingRight: 20,
         paddingTop: 12
     },
     dropdownInput: {
@@ -101,7 +103,9 @@ class CategoryDetail extends Component {
         return {
             title: navigation.state.params ? navigation.state.params.title : "Category",
             headerStyle: header,
-            headerLeft: <TouchableOpacity onPress={() => navigation.goBack()}>
+            headerLeft: <TouchableOpacity onPress={() => {
+                navigation.goBack()
+            }}>
                             <Icon name="chevron-left" style={headerLeft}/>
                         </TouchableOpacity>,
             headerRight: <TouchableOpacity onPress={ showAdd || cancel }>
@@ -110,17 +114,19 @@ class CategoryDetail extends Component {
         }
     };
 
+    state = {
+        title: '',
+        description: ''
+    };
+
     constructor(props) {
         super(props);
 
-        this.state = {
-            text: ''
-        };
-
-        this.showAddCategory = this.showAddCategory.bind(this);
-        this.updateNavBar = this.updateNavBar.bind(this);
-        this.dismissAlert = this.dismissAlert.bind(this);
-        this.createTodo = this.createTodo.bind(this);
+        this.showAddCategory    = this.showAddCategory.bind(this);
+        this.updateTitle        = this.updateTitle.bind(this);
+        this.updateDescription  = this.updateDescription.bind(this);
+        this.dismissAlert       = this.dismissAlert.bind(this);
+        this.createTodo         = this.createTodo.bind(this);
     }
 
     keyExtractor = item => item.id;
@@ -133,7 +139,7 @@ class CategoryDetail extends Component {
         this.props.navigation.setParams({
             showAddCategory: this.showAddCategory,
             dismiss: this.dismissAlert
-        })
+        });
     }
 
     dismissAlert() {
@@ -151,17 +157,21 @@ class CategoryDetail extends Component {
         })
     }
 
-    updateNavBar(text) {
-        this.setState({ text });
+    updateTitle(title) {
+        this.setState({ title });
+    }
+
+    updateDescription(description) {
+        this.setState({ description });
     }
 
     createTodo() {
         const { createTodo, navigation, user } = this.props;
-        const { text } = this.state;
+        const { title, description } = this.state;
 
         createTodo({
-            title: text,
-            description: 'Something goes heree',
+            title,
+            description,
             userId: user.id,
             categoryId: navigation.state.params.categoryId,
             entryId: navigation.state.params.entryId
@@ -204,18 +214,31 @@ class CategoryDetail extends Component {
                 <Dropdown
                     ref={(ref) => this.dropdown = ref }
                     containerStyle={ dropdownContainer }>
-                    <TextInput
-                        style={ dropdownInput }
-                        placeholder={ 'Add a new Todo...'}
-                        placeholderTextColor={ '#ffffff' }
-                        onChangeText={ text => this.updateNavBar(text) }
-                        value={ this.state.text }
-                    />
-                    <TouchableOpacity onPress={ this.createTodo }>
-                        <View style={{ width: 60, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Icon name="plus" style={{color: 'white', fontSize: 30}}/>
-                        </View>
-                    </TouchableOpacity>
+                    <View style={{ flex: 1 }}>
+                        <TextInput
+                            style={ [dropdownInput, { marginBottom: 6 }] }
+                            placeholder={ 'Add a new Todo...'}
+                            placeholderTextColor={ '#ffffff' }
+                            onChangeText={ title => this.updateTitle(title) }
+                            value={ this.state.title }
+                        />
+                        <TextInput
+                            style={ dropdownInput }
+                            placeholder={ 'Add a Description...'}
+                            placeholderTextColor={ '#ffffff' }
+                            onChangeText={ description => this.updateDescription(description) }
+                            value={ this.state.description }
+                            multiline={ true }
+                        />
+                        <FullWidthButton
+                            title="Add Todo"
+                            icon="plus"
+                            onPress={ this.createTodo }
+                            style={ { borderColor: 'white', marginTop: 20, marginBottom: 0 } }
+                            titleStyle={ { color: 'white' } }
+                            leftIconStyle={ { color: 'white' } }
+                        />
+                    </View>
                 </Dropdown>
             </View>
         )

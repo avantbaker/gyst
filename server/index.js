@@ -3,9 +3,12 @@ import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
 import bodyParser from 'body-parser';
 import { createServer } from 'http';
+import jwt from 'express-jwt';
+
+import { JWT_SECRET } from './config';
+import { User } from './data/connectors';
 
 import { Schema } from './data/schema';
-import { Mocks } from './data/mocks';
 import Resolvers from "./data/resolvers";
 
 const GRAPHQL_PORT = 8080;
