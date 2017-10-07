@@ -19,6 +19,7 @@ import Dropdown from '../components/dropdown.component';
 import { TODO_QUERY } from "../graphql/todos.query";
 import { CREATE_TODO_MUTATION } from "../graphql/create-todo.mutation";
 import FullWidthButton from "../components/full-width-button.component";
+import {USER_QUERY} from "../graphql/user.query";
 
 const styles = StyleSheet.create({
     screenWrapper: {
@@ -254,27 +255,9 @@ const createTodo = graphql( CREATE_TODO_MUTATION, {
     props: ({ownProps, mutate}) => ({
         createTodo: (args) => mutate({
             variables: args,
-            update: (store, { data: { createTodo }}) => {
-                // Get current cached data
-                const data = store.readQuery({
-                    query: TODO_QUERY,
-                    variables: {
-                        id: 1
-                    }
-                });
-                // add the completion status to the to do for the Optimistic UI update
-                createTodo.complete = false;
-                // add the to do to the list of cached todos
-                data.user.entries[0].todos.push(createTodo);
-                // Re write to the cache
-                store.writeQuery({
-                    query: TODO_QUERY,
-                    variables: {
-                        id: 1
-                    },
-                    data
-                });
-            }
+            refetchQueries: [
+                { query: TODO_QUERY },
+            ],
         })
     })
 });

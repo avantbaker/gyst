@@ -5,7 +5,7 @@ dotenv.config({ silent: true });
 const { JWT_TOKEN } = process.env;
 
 const defaults = {
-    JWT_TOKEN: 'a3X7hI9o0odi9dkru34kjsIjDJkdsoeER93i4ed'
+    JWT_TOKEN: 'secret_code'
 };
 
 Object.keys(defaults).forEach((key) => {
@@ -14,4 +14,4 @@ Object.keys(defaults).forEach((key) => {
     }
 });
 
-export default JWT_SECRET;
+export default JWT_TOKEN;

@@ -6,6 +6,9 @@ export const TODO_QUERY = gql`
                 id
                 entries {
                   id
+                  incompleteTodos {
+                    id
+                  }
                   todos {
                     id
                     title

@@ -42,9 +42,9 @@ const UserModel = db.define('user', {
 const EntryModel = db.define( 'entry' );
 
 // User Model Relationships
-UserModel.belongsToMany( CategoryModel, { through: 'UserCategory' });        // category has a user_id column now
-UserModel.hasMany(EntryModel);                                               // entry has a user_id column now
-UserModel.hasMany(TodoModel);
+UserModel.belongsToMany( CategoryModel, { through: 'UserCategory' });        // category has a user_id column now // entry has a user_id column now
+UserModel.belongsToMany(TodoModel, { through: 'UserTodo' });
+UserModel.belongsToMany( EntryModel, { through: 'UserEntry' });
 
 // Category Model Relationships
 CategoryModel.hasOne(TodoModel, { as: 'Category', foreignKey: 'catId' });
@@ -52,10 +52,12 @@ CategoryModel.belongsToMany( UserModel, { through: 'UserCategory' });
 
 // Entry Model Relationships
 EntryModel.belongsToMany( TodoModel, { through: TodoCategory } );
+EntryModel.belongsTo(UserModel);
 
 // To do Model Relationships
 TodoModel.belongsTo( EntryModel, { through: TodoCategory } );
 TodoModel.belongsTo( CategoryModel, { foreignKey: 'catId' } );
+TodoModel.belongsToMany(UserModel, { through: 'UserTodo' });
 
 
 const USERS = 1;
@@ -146,7 +148,7 @@ db.sync({ force: true }).then(() => {
                             userId: user.id,
                         }).then(entry => {
                             _.times(TODOS_PER_ENTRY, () => {
-                                return entry.createTodo({
+                                return user.createTodo({
                                     title: faker.lorem.words(3),
                                     description: faker.lorem.sentences(4),
                                     complete: randomizeBoolean(),

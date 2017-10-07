@@ -18,16 +18,16 @@ export const Resolvers = {
     },
     Mutation: {
         createTodo(_, { title, description, userId, categoryId, entryId }){
-            return Todo.create({
-                title,
-                description,
-                userId,
-                catId: categoryId,
-                entryId,
-                complete: false
-            });
+            return User.findOne({ where: { id: userId }}).then(user => {
+                return user.createTodo({
+                    title,
+                    description,
+                    catId: categoryId,
+                    entryId,
+                    complete: false
+                });
+            })
         }
-
     },
     User: {
         todos(user) {
@@ -48,7 +48,9 @@ export const Resolvers = {
     },
     Entry: {
         todos(entry) {
-            return entry.getTodos();
+            return entry.getUser().then(user => {
+                return user.getTodos({ where: { entryId: entry.id }});
+            })
         },
         user(entry) {
             return entry.getUser();

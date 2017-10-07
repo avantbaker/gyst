@@ -164,11 +164,11 @@ class Home extends Component {
 const userQuery = graphql(USER_QUERY, {
     options: ownProps => ({
         variables: { id: 1 },
-        updateQuery:( prev, { fetchMoreResult }) => {
-            return Object.assign({}, prev, {
-                user: fetchMoreResult.user
-            });
-        }
+        // updateQuery:( prev, { fetchMoreResult }) => {
+        //     return Object.assign({}, prev, {
+        //         user: fetchMoreResult.user
+        //     });
+        // }
     }),
     props: ({data: { loading, user, refetch }}) => ({ loading, user, refetch })
 });
